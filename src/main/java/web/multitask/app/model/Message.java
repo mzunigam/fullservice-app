@@ -8,5 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class Message implements java.io.Serializable{
+    private String user;
     private String content;
 }

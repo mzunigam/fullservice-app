@@ -13,11 +13,11 @@ import java.util.Date;
 @Controller
 public class MessageController {
 
-    @MessageMapping("/websocket/{project}/{user}")
-    @SendTo("/topic/message/{project}/{user}")
-    public Response envio(@PathVariable("project") String project, @PathVariable("user") String user,
-            Message message) {
-        return new Response(user, project,message.getContent(), new Date().toString());
+    @MessageMapping("/websocket/{project}/{topic}")
+    @SendTo("/topic/message/{project}/{topic}")
+    public Response envio(@PathVariable("project") String project, @PathVariable("topic") String topic,
+                          Message message) {
+        return new Response(message.getUser(), project, topic, message.getContent(), new Date().toString());
     }
 
 }

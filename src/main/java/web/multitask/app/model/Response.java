@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 public class Response implements java.io.Serializable{
     private String user;
     private String project;
+    private String topic;
     private String content;
     private String date;
 }
