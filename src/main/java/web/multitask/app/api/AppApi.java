@@ -3,7 +3,6 @@ package web.multitask.app.api;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 import web.multitask.app.mysql.ProcedureMysql;
 
@@ -14,7 +13,6 @@ public class AppApi {
 
     final ProcedureMysql procedureMysql;
 
-    @Autowired
     public AppApi(ProcedureMysql procedureMysql) {
         this.procedureMysql = procedureMysql;
     }

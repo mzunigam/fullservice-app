@@ -1,8 +1,7 @@
 package web.multitask.app.mysql;
 
-import org.json.JSONArray;
+
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +11,9 @@ import java.util.logging.Logger;
 
 @Service
 public class ProcedureMysql {
+    
     private final JdbcTemplate jdbcTemplate;
-    @Autowired
+
     public ProcedureMysql(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
