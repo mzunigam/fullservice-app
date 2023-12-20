@@ -49,8 +49,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                  .cors(AbstractHttpConfigurer::disable).csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        authorizeRequests -> authorizeRequests.antMatchers("/test/admin").hasRole("ADMIN")
-                                .antMatchers("/test/user").hasRole("USER")
+                        authorizeRequests -> authorizeRequests
+                                .antMatchers("/test/admin").hasAuthority("ADMIN")
+                                .antMatchers("/test/user").hasAuthority("USER")
                                  .antMatchers(HttpMethod.GET, "/**").permitAll()
                                 .antMatchers(HttpMethod.POST, "/**").permitAll()
                                 .anyRequest()

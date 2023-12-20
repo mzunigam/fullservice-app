@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import web.multitask.app.mysql.ProcedureMysql;
+import web.multitask.app.repository.UserRespository;
 
 @RestController
 @CrossOrigin("*")
@@ -12,9 +13,11 @@ import web.multitask.app.mysql.ProcedureMysql;
 public class AppApi {
 
     final ProcedureMysql procedureMysql;
+    final UserRespository userRepo;
 
-    public AppApi(ProcedureMysql procedureMysql) {
+    public AppApi(ProcedureMysql procedureMysql, UserRespository userRepo) {
         this.procedureMysql = procedureMysql;
+        this.userRepo = userRepo;
     }
 
     @PostMapping("/procedure")
@@ -32,6 +35,11 @@ public class AppApi {
         } else {
             return new JSONObject().put("data", new JSONArray()).put("message", "Invalid Request").put("status", false).toString();
         }
+    }
+
+    @GetMapping("/users")
+    public String getUsers (){
+        return new JSONObject().put("data", userRepo.findAll()).put("message", "Success").put("status", true).toString();
     }
 
 }
