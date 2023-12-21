@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 @Service
 public class ProcedureMysql {
@@ -18,15 +17,34 @@ public class ProcedureMysql {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public JSONObject ProcedureExecution(String query , Object[] params) {
+    public JSONObject ProcedureExecution(String procedure ,String database, Object[] params) {
         try {
-            List<Map<String, Object>> list = jdbcTemplate.queryForList(query, params);
+            StringBuilder query = new StringBuilder("CALL " + database + "." + procedure);
+
+            if (params.length > 0) {
+                query.append("(");
+                for (int i = 0; i < params.length; i++) {
+                    query.append("?");
+                    if (i < params.length - 1) {
+                        query.append(",");
+                    }
+                }
+                query.append(")");
+            }
+
+            String checkProcedure = "SELECT COUNT(*) FROM information_schema.routines WHERE routine_schema = '" + database + "' AND routine_name = '" + procedure + "'";
+            List<Map<String, Object>> countProcedure = jdbcTemplate.queryForList(checkProcedure);
+            
+            if (countProcedure.get(0).get("COUNT(*)").toString().equals("0")) {
+                return new JSONObject().put("message", "Procedure not found").put("status", false);
+            }
+
+            List<Map<String, Object>> list = jdbcTemplate.queryForList(query.toString(), params);
             JSONObject result = new JSONObject();
             result.put("data", list);
             return result;
         } catch (Exception e) {
-            Logger.getLogger("ProcedureMysql").warning(e.getMessage());
+            return new JSONObject().put("data", new JSONObject()).put("message", e.getMessage()).put("status", false);
         }
-        return null;
     }
 }

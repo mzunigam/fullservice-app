@@ -9,6 +9,9 @@ import web.multitask.app.repository.UserRespository;
 import web.multitask.app.utils.JwtTokenUtil;
 
 import java.util.Objects;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @RestController
@@ -34,5 +37,16 @@ class JwtApi {
             return new JSONObject().put("token", jwtTokenUtil.generateToken((User) userDetails)).put("message", "Generated").put("status", true).toString();
         }
     }
+
+    @PostMapping("/validate")
+    public String validateToken(@RequestBody String token) {
+        JSONObject json = new JSONObject(token);
+        if (jwtTokenUtil.validateToken(json.getString("token"))) {
+            return new JSONObject().put("message", "Valid Token").put("status", true).toString();
+        } else {
+            return new JSONObject().put("message", "Invalid Token").put("status", false).toString();
+        }
+    }
+    
 
 }
