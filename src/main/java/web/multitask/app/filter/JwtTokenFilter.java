@@ -36,32 +36,31 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException, java.io.IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException, java.io.IOException {
 
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (request.getRequestURI().startsWith("/token")) {
+        String token = "";
+        try{
+            token = header.split(" ")[1];
+        }catch (Exception e){
+            token = null;
+        }
+        if (token == null || token.isEmpty()) {
             chain.doFilter(request, response);
         } else {
-            if (header == null || !header.startsWith("Bearer ")) {
-                response.sendError(403, "Access Denied");
+            if (jwtTokenUtil.validateToken(token)) {
+                JSONObject jsonToken = new JSONObject(jwtTokenUtil.getDataToken(token));
+                UserDetails userDetails = userRepo.findByUsername(jsonToken.getString("username"));
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
                 chain.doFilter(request, response);
             } else {
-                String token = header.split(" ")[1];
-                if (jwtTokenUtil.validateToken(token)) {
-                    JSONObject jsonToken = new JSONObject(jwtTokenUtil.getDataToken(token));
-                    UserDetails userDetails = userRepo.findByUsername(jsonToken.getString("username"));
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                    response.setStatus(200);
-                    chain.doFilter(request, response);
-                } else {
-                    response.sendError(401, "Invalid Token");
-                    chain.doFilter(request, response);
-                }
+                response.sendError(401, "Invalid Token");
             }
         }
-
     }
-
 }

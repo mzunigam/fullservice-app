@@ -34,8 +34,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-    return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Override
@@ -45,17 +46,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                 .cors(AbstractHttpConfigurer::disable).csrf(AbstractHttpConfigurer::disable)
+        http.cors(AbstractHttpConfigurer::disable).csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         authorizeRequests -> authorizeRequests
-                                .antMatchers("/test/admin").hasAuthority("ADMIN")
-                                .antMatchers("/test/user").hasAuthority("USER")
-                                 .antMatchers(HttpMethod.GET, "/**").permitAll()
-                                .antMatchers(HttpMethod.POST, "/**").permitAll()
+                                .antMatchers("/security/**").hasAnyAuthority("ADMIN")
+                                .antMatchers("/api/**").hasAnyAuthority("ADMIN", "USER")
+                                .antMatchers("/token/**").permitAll()
+                                .antMatchers("/private/**").hasAnyAuthority("ADMIN","USER")
+                                .antMatchers("/public/**").permitAll()
+                                .antMatchers(HttpMethod.GET, "/**").permitAll()
                                 .anyRequest()
                                 .authenticated());
-        http.addFilterBefore(new JwtTokenFilter(jwtTokenUtil,userRepo), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtTokenFilter(jwtTokenUtil, userRepo), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean
@@ -63,10 +65,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-        @Bean
+    @Bean
     public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source =
-            new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.addAllowedOrigin("*");

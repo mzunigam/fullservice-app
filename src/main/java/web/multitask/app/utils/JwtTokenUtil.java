@@ -24,7 +24,7 @@ public class JwtTokenUtil implements Serializable{
         JSONObject json = new JSONObject();
         json.put("username", user.getUsername());
         return Jwts.builder()
-                .setSubject(json.toString())
+                .setSubject(json.toString()) 
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()))

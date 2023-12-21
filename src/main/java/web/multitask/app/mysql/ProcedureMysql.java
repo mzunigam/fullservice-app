@@ -42,6 +42,8 @@ public class ProcedureMysql {
             List<Map<String, Object>> list = jdbcTemplate.queryForList(query.toString(), params);
             JSONObject result = new JSONObject();
             result.put("data", list);
+            result.put("message", "Success");
+            result.put("status", true);
             return result;
         } catch (Exception e) {
             return new JSONObject().put("data", new JSONObject()).put("message", e.getMessage()).put("status", false);
