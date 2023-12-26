@@ -32,7 +32,7 @@ public class ProcedureMysql {
                 query.append(")");
             }
 
-            String checkProcedure = "SELECT COUNT(*) FROM information_schema.routines WHERE routine_schema = '" + database + "' AND routine_name = '" + procedure + "'";
+            String checkProcedure = "SELECT COUNT(*) FROM information_schema.routines WHERE routine_schema = '" + database + "' AND routine_name = '" + procedure;
             List<Map<String, Object>> countProcedure = jdbcTemplate.queryForList(checkProcedure);
             
             if (countProcedure.get(0).get("COUNT(*)").toString().equals("0")) {
