@@ -16,7 +16,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-
 import web.multitask.app.filter.JwtTokenFilter;
 import web.multitask.app.repository.UserRespository;
 import web.multitask.app.utils.JwtTokenUtil;
@@ -34,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+    AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
             throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
@@ -50,10 +49,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeHttpRequests(
                         authorizeRequests -> authorizeRequests
                                 .antMatchers("/security/**").hasAnyAuthority("ADMIN")
-                                .antMatchers("/api/**").hasAnyAuthority("ADMIN", "USER")
+//                                .antMatchers("/api/**").hasAnyAuthority("ADMIN", "USER")
                                 .antMatchers("/token/**").permitAll()
-                                .antMatchers("/private/**").hasAnyAuthority("ADMIN","USER")
-                                .antMatchers("/public/**").permitAll()
+                                .regexMatchers(".*/private/.*").hasAnyAuthority("ADMIN","USER")
+                                .regexMatchers(".*/public/.*").permitAll()
                                 .antMatchers(HttpMethod.GET, "/**").permitAll()
                                 .anyRequest()
                                 .authenticated());
@@ -66,7 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public CorsFilter corsFilter() {
+    CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);

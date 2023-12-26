@@ -9,7 +9,7 @@ import web.multitask.app.filter.JwtTokenFilter;
 public class FilterConfig {
 
     @Bean
-    public FilterRegistrationBean<JwtTokenFilter> filterRegistrationBean() {
+    FilterRegistrationBean<JwtTokenFilter> filterRegistrationBean() {
         FilterRegistrationBean<JwtTokenFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new JwtTokenFilter());
         registrationBean.addUrlPatterns("/**");

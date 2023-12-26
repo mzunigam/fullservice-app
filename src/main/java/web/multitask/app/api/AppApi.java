@@ -19,7 +19,7 @@ public class AppApi {
         this.userRepo = userRepo;
     }
 
-    @PostMapping("/procedure")
+    @PostMapping("/private/procedure")
     public String callProcedure(@RequestBody String body) {
         JSONObject json = new JSONObject(body);
         if (json.has("procedure")) {
@@ -35,7 +35,7 @@ public class AppApi {
         }
     }
 
-    @GetMapping("/users")
+    @GetMapping("/private/users")
     public String getUsers (){
         return new JSONObject().put("data", userRepo.findAll()).put("message", "Success").put("status", true).toString();
     }

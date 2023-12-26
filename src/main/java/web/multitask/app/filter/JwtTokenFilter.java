@@ -5,6 +5,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -36,7 +37,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+    protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain chain)
             throws ServletException, IOException, java.io.IOException {
 
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -47,6 +48,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             token = null;
         }
         if (token == null || token.isEmpty()) {
+            SecurityContextHolder.getContext().setAuthentication(null);
             chain.doFilter(request, response);
         } else {
             if (jwtTokenUtil.validateToken(token)) {

@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequestMapping("/token")
 @CrossOrigin
-class JwtApi {
+class JWTApi {
 
     private final JwtTokenUtil jwtTokenUtil;
     private final UserRespository userRepo;
-    public JwtApi(JwtTokenUtil jwtTokenUtil, UserRespository userRepo) {
+    public JWTApi(JwtTokenUtil jwtTokenUtil, UserRespository userRepo) {
         this.jwtTokenUtil = jwtTokenUtil;
         this.userRepo = userRepo;
     }
@@ -47,6 +47,5 @@ class JwtApi {
             return new JSONObject().put("message", "Invalid Token").put("status", false).toString();
         }
     }
-    
 
 }
