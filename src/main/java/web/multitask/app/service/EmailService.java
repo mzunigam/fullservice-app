@@ -32,16 +32,19 @@ import org.springframework.web.multipart.MultipartFile;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import web.multitask.app.model.EmailRequest;
+import web.multitask.app.utils.CommonUtils;
 
 @Service
 public class EmailService {
 
     Dotenv dotenv;
     Session session;
+    CommonUtils commonUtils;
 
-    public EmailService(Dotenv dotenv, Session session) {
+    public EmailService(Dotenv dotenv, Session session, CommonUtils commonUtils) {
         this.dotenv = dotenv;
         this.session = session;
+        this.commonUtils = commonUtils;
     }
 
     public MimeMessage htmlMessage(EmailRequest request) throws UnsupportedEncodingException {
@@ -96,16 +99,6 @@ public class EmailService {
         }
     }
 
-    public void deleteAllFiles (String file_folder){
-        File file = new File(file_folder);
-        if(file.exists()){
-            File[] files = file.listFiles();
-            for(File f: files){
-                f.delete();
-            }
-        }
-    }
-
     public MimeMessage simpleMessage(EmailRequest request) throws UnsupportedEncodingException {
         try {
             MimeMessage message = new MimeMessage(session);
@@ -131,7 +124,11 @@ public class EmailService {
             t.connect(email, password);
             t.sendMessage(message, message.getAllRecipients());
             t.close();
-            deleteAllFiles(dotenv.get("FILE_FOLDER"));
+//            CommonUtils.deleteAllFiles();
+            boolean deletes = commonUtils.deleteAllFiles();
+            if(!deletes){
+                System.out.println("Error al eliminar los archivos");
+            }
             return new JSONObject().put("message", "OK").put("status", true);
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -147,7 +144,7 @@ public class EmailService {
             try {
                 return new InternetAddress(recipient);
             } catch (AddressException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
                 return null;
             }
         }).filter(Objects::nonNull).collect(Collectors.toList()).toArray(addresses);

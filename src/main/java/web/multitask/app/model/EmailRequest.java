@@ -1,5 +1,6 @@
 package web.multitask.app.model;
 
+import org.json.JSONObject;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.Getter;
@@ -16,4 +17,5 @@ public class EmailRequest {
     private String subject;
     private String body;
     private MultipartFile[] files;
+    private JSONObject extra;
 }

@@ -10,24 +10,25 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import web.multitask.app.filter.JwtTokenFilter;
+import web.multitask.app.filter.JWTokenFilter;
 import web.multitask.app.repository.UserRespository;
-import web.multitask.app.utils.JwtTokenUtil;
+import web.multitask.app.utils.JWTokenUtil;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserRespository userRepo;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JWTokenUtil jwtTokenUtil;
 
-    public SecurityConfig(UserRespository userRepo, JwtTokenUtil jwtTokenUtil) {
+    public SecurityConfig(UserRespository userRepo, JWTokenUtil jwtTokenUtil) {
         this.userRepo = userRepo;
         this.jwtTokenUtil = jwtTokenUtil;
     }
@@ -46,17 +47,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors(AbstractHttpConfigurer::disable).csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeHttpRequests(
                         authorizeRequests -> authorizeRequests
                                 .antMatchers("/security/**").hasAnyAuthority("ADMIN")
-//                                .antMatchers("/api/**").hasAnyAuthority("ADMIN", "USER")
-                                .antMatchers("/token/**").permitAll()
                                 .regexMatchers(".*/private/.*").hasAnyAuthority("ADMIN","USER")
                                 .regexMatchers(".*/public/.*").permitAll()
+                                .regexMatchers(".*/service/.*").hasAnyAuthority("ADMIN","SERVICE")
                                 .antMatchers(HttpMethod.GET, "/**").permitAll()
-                                .anyRequest()
-                                .authenticated());
-        http.addFilterBefore(new JwtTokenFilter(jwtTokenUtil, userRepo), UsernamePasswordAuthenticationFilter.class);
+//                                .antMatchers(HttpMethod.POST, "/**").permitAll()
+                                .antMatchers("/token/**").permitAll());
+//                                .anyRequest()
+//                                .authenticated());
+        http.addFilterBefore(new JWTokenFilter(jwtTokenUtil, userRepo), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean
@@ -68,7 +71,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
+//        config.setAllowCredentials(true);
         config.addAllowedOrigin("*");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");

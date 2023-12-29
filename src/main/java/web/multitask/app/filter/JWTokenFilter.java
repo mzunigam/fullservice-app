@@ -18,37 +18,44 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.io.IOException;
 import web.multitask.app.repository.UserRespository;
-import web.multitask.app.utils.JwtTokenUtil;
+import web.multitask.app.utils.JWTokenUtil;
+
+import java.util.Enumeration;
 
 @Component
 @Order(1)
-public class JwtTokenFilter extends OncePerRequestFilter {
+public class JWTokenFilter extends OncePerRequestFilter {
 
-    private JwtTokenUtil jwtTokenUtil = null;
+    private JWTokenUtil jwtTokenUtil = null;
 
     private UserRespository userRepo = null;
 
-    public JwtTokenFilter(JwtTokenUtil jwtTokenUtil, UserRespository userRepo) {
+    public JWTokenFilter(JWTokenUtil jwtTokenUtil, UserRespository userRepo) {
         this.jwtTokenUtil = jwtTokenUtil;
         this.userRepo = userRepo;
     }
 
-    public JwtTokenFilter() {
+    public JWTokenFilter() {
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain chain)
             throws ServletException, IOException, java.io.IOException {
+        response.setContentType("application/json");
 
-        final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String token = "";
-        try{
-            token = header.split(" ")[1];
-        }catch (Exception e){
+//        final String queryAuthorization = request.getParameter(HttpHeaders.AUTHORIZATION);
+        final String Authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        String token;
+
+        try {
+            token = Authorization.split(" ")[1];
+        } catch (Exception e) {
             token = null;
         }
+
         if (token == null || token.isEmpty()) {
-            SecurityContextHolder.getContext().setAuthentication(null);
+//            SecurityContextHolder.getContext().setAuthentication(null);
             chain.doFilter(request, response);
         } else {
             if (jwtTokenUtil.validateToken(token)) {

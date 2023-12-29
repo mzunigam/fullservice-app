@@ -2,6 +2,7 @@ package web.multitask.app.api;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import web.multitask.app.mysql.ProcedureMysql;
 import web.multitask.app.repository.UserRespository;
@@ -20,24 +21,24 @@ public class AppApi {
     }
 
     @PostMapping("/private/procedure")
-    public String callProcedure(@RequestBody String body) {
+    public ResponseEntity<?> callProcedure(@RequestBody String body) {
         JSONObject json = new JSONObject(body);
         if (json.has("procedure")) {
             try {
                 JSONArray params = json.isNull("params") ? new JSONArray() : json.getJSONArray("params");
                 JSONObject response = procedureMysql.ProcedureExecution(json.getString("procedure"),json.getString("database"), params.toList().toArray());
-                return response.toString();
+                return ResponseEntity.ok(response.toMap());
             } catch (Exception e) {
-                return new JSONObject().put("data", new JSONArray()).put("message", e.getMessage()).put("status", false).toString();
+                return ResponseEntity.internalServerError().body(new JSONObject().put("message", e.getMessage()).put("status", false).toMap());
             }
         } else {
-            return new JSONObject().put("data", new JSONArray()).put("message", "Invalid Request").put("status", false).toString();
+            return ResponseEntity.badRequest().body(new JSONObject().put("message", "Invalid Request").put("status", false).toMap());
         }
     }
 
     @GetMapping("/private/users")
-    public String getUsers (){
-        return new JSONObject().put("data", userRepo.findAll()).put("message", "Success").put("status", true).toString();
+    public ResponseEntity<?> getUsers (){
+        return ResponseEntity.ok(new JSONObject().put("data", userRepo.findAll()).put("message", "Success").put("status", true).toMap());
     }
 
 }
