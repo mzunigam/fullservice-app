@@ -32,12 +32,17 @@ class JWTokenApi {
         JSONObject response;
         JSONObject json = new JSONObject(authenticationRequest);
         String username = json.getString("username");
+        try{
         UserDetails userDetails = userRepo.findByUsername(username);
         if (!Objects.equals(userDetails.getPassword(), json.getString("password"))) {
             response = new JSONObject().put("token", "").put("message", "Invalid Credentials").put("status", false);
             return ResponseEntity.status(401).body(response.toMap());
         } else {
             return ResponseEntity.ok(new JSONObject().put("token", jwtTokenUtil.generateToken((User) userDetails, json.optBigInteger("ms", BigInteger.valueOf(3600000)))).put("message", "Generated").put("status", true).toMap());
+        }
+        }catch (Exception e){
+            response = new JSONObject().put("token", "").put("message", "Invalid Credentials").put("status", false);
+            return ResponseEntity.status(401).body(response.toMap());
         }
     }
 
@@ -87,6 +92,12 @@ class JWTokenApi {
         } else {
             return ResponseEntity.status(401).body(new JSONObject().put("token", "").put("message", "Invalid Credentials").put("status", false).toMap());
         }
+    }
+
+    @PostMapping("/remaining")
+    public ResponseEntity<?> remainingTime(@RequestBody String token) {
+        JSONObject json = new JSONObject(token);
+        return ResponseEntity.ok(new JSONObject().put("remaining", jwtTokenUtil.getExperyTime(json.getString("token"))).put("message", "OK").put("status", true).toMap());
     }
 
 }

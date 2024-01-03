@@ -68,4 +68,13 @@ public class JWTokenUtil implements Serializable{
                 .before(new Date());
     }
 
+    public int getExperyTime(String token){
+        return (int) ((Jwts.parserBuilder()
+                .setSigningKey(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration()
+                .getTime() - new Date().getTime())/1000);
+    }
 }

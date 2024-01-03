@@ -11,7 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-
 @Entity(name = "roles")
 public class Role {
     @Id

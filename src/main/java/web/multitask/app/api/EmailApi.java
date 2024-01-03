@@ -29,7 +29,7 @@ public class EmailApi {
         this.dotenv = dotenv;
     }
 
-    @RequestMapping(path = "/public/simple", method = RequestMethod.POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @RequestMapping(path = "/public/simple_generate", method = RequestMethod.POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> simple(@ModelAttribute EmailRequest request) {
         try {
             MimeMessage message = emailService.simpleMessage(request);
@@ -40,7 +40,7 @@ public class EmailApi {
         }
     }
 
-    @RequestMapping(path = "/private/full", method = RequestMethod.POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @RequestMapping(path = "/private/generate", method = RequestMethod.POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> full(@ModelAttribute EmailRequest request) {
         try {
             MimeMessage message = emailService.htmlMessage(request);
